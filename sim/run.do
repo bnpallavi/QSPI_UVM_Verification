@@ -14,7 +14,7 @@ vlog +acc ../uvm/qspi_pkg.sv
 # TOP
 vlog +acc ../tb/top.sv
 
-vsim top -voptargs=+acc +UVM_TESTNAME=qspi_test
-
+vsim top -voptargs=+acc +UVM_TESTNAME=qspi_test -coverage
 run -all
-
+coverage save qspi.ucdb
+coverage report -details
