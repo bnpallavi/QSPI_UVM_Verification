@@ -1,0 +1,12 @@
+# Questa / ModelSim generated files
+sim/work/
+sim/*.wlf
+sim/*.err
+modelsim.ini
+
+# Backup files
+*.bak
+
+# Temporary files
+*.log
+*.tmp
