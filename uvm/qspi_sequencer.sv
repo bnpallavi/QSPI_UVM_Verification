@@ -7,3 +7,4 @@ class qspi_sequencer extends uvm_sequencer #(qspi_item);
    endfunction
 
 endclass
+
