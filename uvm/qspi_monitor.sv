@@ -33,6 +33,10 @@ class qspi_monitor extends uvm_monitor;
 
    `uvm_component_utils(qspi_monitor)
 
+
+   // ---------------------------------
+   // constructor
+   // ---------------------------------
    function new(string name, uvm_component parent);
       super.new(name,parent);
 
@@ -41,16 +45,23 @@ class qspi_monitor extends uvm_monitor;
    endfunction
 
 
+   // ---------------------------------
+   // build phase
+   // ---------------------------------
    function void build_phase(uvm_phase phase);
       void'(uvm_config_db#(virtual qspi_if)::get(this,"","vif",vif));
    endfunction
 
 
+   // ---------------------------------
+   // run phase
+   // ---------------------------------
    task run_phase(uvm_phase phase);
 
       qspi_item tr;
 
       forever begin
+
          @(posedge vif.start);
 
          tr = new();
@@ -59,10 +70,11 @@ class qspi_monitor extends uvm_monitor;
          address    = vif.address;
          burst_len  = vif.burst_len;
 
-         tr.opcode  = opcode;
-         tr.address = address;
-         tr.burst_len = burst_len;
+         tr.opcode     = opcode;
+         tr.address    = address;
+         tr.burst_len  = burst_len;
 
+         // sample coverage
          qspi_cg.sample();
 
          `uvm_info("MON",
@@ -71,8 +83,28 @@ class qspi_monitor extends uvm_monitor;
            UVM_LOW)
 
          ap.write(tr);
+
       end
 
    endtask
 
+
+   // ---------------------------------
+   // report phase (FINAL COVERAGE PRINT)
+   // ---------------------------------
+   function void report_phase(uvm_phase phase);
+
+      real cov;
+
+      cov = qspi_cg.get_inst_coverage();
+
+      `uvm_info("COVERAGE",
+         $sformatf("\n=================================\nQSPI Functional Coverage = %0.2f%%\n=================================",
+                   cov),
+         UVM_NONE)
+
+   endfunction
+
+
 endclass
+
