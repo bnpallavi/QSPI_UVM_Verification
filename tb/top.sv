@@ -6,7 +6,6 @@ import qspi_pkg::*;
 
 module top;
 
-
    // -------------------------
    // Clock
    // -------------------------
@@ -17,12 +16,25 @@ module top;
    // Interface
    // -------------------------
    qspi_if vif(clk);
+   // -------------------------
+// RESET GENERATION (FIX)
+// -------------------------
+   initial begin
+      vif.reset_n = 0;     // assert reset
+      vif.start   = 0;     // initialize start
+
+      #50;
+
+      vif.reset_n = 1;     // release reset
+
+      $display("[%0t] RESET RELEASED", $time);
+   end
 
    // -------------------------
    // DUT : QSPI Master
    // -------------------------
    master dut (
-      .clk        (clk),
+      .clk        (vif.clk),   // ? FIXED
       .reset_n    (vif.reset_n),
       .start      (vif.start),
       .opcode     (vif.opcode),
@@ -51,7 +63,7 @@ module top;
    // -------------------------
    initial begin
       uvm_config_db#(virtual qspi_if)::set(null, "*", "vif", vif);
-      run_test("qspi_test");
+      run_test("qspi_quad_test");
    end
 
 endmodule
