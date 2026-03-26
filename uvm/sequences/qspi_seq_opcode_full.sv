@@ -32,4 +32,3 @@ class qspi_seq_opcode_full extends uvm_sequence #(qspi_item);
    endtask
 
 endclass
-
