@@ -18,4 +18,3 @@ class qspi_seq_smoke extends qspi_sequence;
    endtask
 
 endclass
-
