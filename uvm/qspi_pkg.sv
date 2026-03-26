@@ -48,5 +48,3 @@ package qspi_pkg;
   
 
 endpackage
-
-
