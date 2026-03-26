@@ -8,14 +8,10 @@ class qspi_driver extends uvm_driver #(qspi_item);
       super.new(name,parent);
    endfunction
 
-
    function void build_phase(uvm_phase phase);
-      super.build_phase(phase);
-
       if(!uvm_config_db#(virtual qspi_if)::get(this,"","vif",vif))
          `uvm_fatal("NOVIF","Interface not set")
    endfunction
-
 
    task run_phase(uvm_phase phase);
 
@@ -29,6 +25,11 @@ class qspi_driver extends uvm_driver #(qspi_item);
 
       seq_item_port.get_next_item(tr);
 
+      `uvm_info("DRV_DEBUG",
+         $sformatf("Driving opcode=%0h address=%0h burst=%0d",
+                   tr.opcode, tr.address, tr.burst_len),
+         UVM_LOW)
+
       vif.start      <= 1;
       vif.opcode     <= tr.opcode;
       vif.address    <= tr.address;
@@ -38,14 +39,16 @@ class qspi_driver extends uvm_driver #(qspi_item);
       @(posedge vif.clk);
       vif.start <= 0;
 
-      // Wait until CS toggles LOW then HIGH
+      // wait for SPI transaction completion
       @(negedge vif.CS);
-      @(posedge vif.CS);
+      @(posedge vif.CS); 
 
+      // allow CS_WAIT state to finish
+      repeat (10) @(posedge vif.clk);
       seq_item_port.item_done();
+
    end
 
 endtask
 
 endclass
-
