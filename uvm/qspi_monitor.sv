@@ -107,4 +107,3 @@ class qspi_monitor extends uvm_monitor;
 
 
 endclass
-
