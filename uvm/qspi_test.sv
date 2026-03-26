@@ -16,18 +16,19 @@ class qspi_test extends uvm_test;
 
    task run_phase(uvm_phase phase);
 
-      qspi_sequence seq;
+   qspi_sequence seq;
 
-      phase.raise_objection(this);
+   phase.raise_objection(this);
 
-      seq = qspi_sequence::type_id::create("seq");
-      seq.start(agent.seqr);
+   seq = qspi_sequence::type_id::create("seq");
 
-      #100;
+   seq.start(agent.seqr);
 
-      phase.drop_objection(this);
+   // wait for final transaction to complete
+   #2000ns;
 
-   endtask
+   phase.drop_objection(this);
+
+endtask
 
 endclass
-
