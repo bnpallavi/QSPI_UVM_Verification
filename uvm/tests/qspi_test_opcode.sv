@@ -23,4 +23,3 @@ class qspi_test_opcode extends qspi_test;
   endtask
 
 endclass
- 
