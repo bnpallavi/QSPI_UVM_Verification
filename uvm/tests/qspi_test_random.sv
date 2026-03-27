@@ -24,4 +24,3 @@ class qspi_test_random extends qspi_test;
   endtask
 
 endclass
-
