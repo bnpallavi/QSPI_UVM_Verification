@@ -19,16 +19,17 @@ module top;
    // -------------------------
 // RESET GENERATION (FIX)
 // -------------------------
-   initial begin
-      vif.reset_n = 0;     // assert reset
-      vif.start   = 0;     // initialize start
+  initial begin
+   vif.reset_n = 0;
+   vif.start   = 0;
 
-      #50;
+   // Flash power-up time (tVSL)
+   #800_000ns;
 
-      vif.reset_n = 1;     // release reset
+   vif.reset_n = 1;
 
-      $display("[%0t] RESET RELEASED", $time);
-   end
+   $display("[%0t] RESET RELEASED", $time);
+end
 
    // -------------------------
    // DUT : QSPI Master
@@ -67,4 +68,3 @@ module top;
    end
 
 endmodule
-
