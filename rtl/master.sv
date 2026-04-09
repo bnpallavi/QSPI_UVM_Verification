@@ -35,8 +35,12 @@ module master (
     assign SCLK = phase;
 
     // IO mapping (SPI single)
-    assign IO = io_oe ? si : 4'bzzzz;   // SI
-    wire   [3:0] so    = IO;               // SO
+    assign IO[0] = io_oe ? si[0] : 1'bz;
+    assign IO[1] = (opcode == 8'hEB && io_oe) ? si[1] : 1'bz;
+    assign IO[2] = (opcode == 8'hEB && io_oe) ? si[2] : 1'bz;
+    assign IO[3] = (opcode == 8'hEB && io_oe) ? si[3] : 1'bz;
+    wire so_single = IO[1];
+    wire [3:0] so_quad = IO;
     //assign IO[3:2] = 2'bzz;
     //assign IO[3:1] = si[3:1];
 
@@ -60,7 +64,7 @@ module master (
             byte_cnt <= 0;
             cs_cnt   <= 0;
             io_oe    <= 1'b0;
-            si[0]    <= 1'b0;
+            si       <= 4'b0000;
             rd_shift <= 8'h00;
         end else begin
             case (state)
@@ -84,7 +88,7 @@ module master (
             // ---------------- OPCODE ----------------
             OP: begin
                 if (!phase) begin
-                    si[0] <= sh8[7];
+                    si <= {3'b000, sh8[7]};
                     phase <= 1'b1;
                    
                 end else begin
@@ -93,7 +97,7 @@ module master (
                     phase <= 1'b0;
                     if (bit_cnt == 7) begin
                         bit_cnt <= 0;
-                        io_oe <= (opcode == 8'h9F) ? 1'b0 : 1'b1;
+                        io_oe <= (opcode == 8'h9F || opcode == 8'h03) ? 1'b0 : 1'b1;
                         state <= (opcode == 8'h9F || opcode == 8'h01) ? DATA : (opcode == 8'h06)? DONE : ADDR;
                         CS <=  (opcode == 8'h06) ? 1'b1 : 1'b0;
                     end
@@ -106,7 +110,7 @@ module master (
                 if (!phase) begin
                         CS <= 1'b0;
                     if((opcode == 8'h38) || (opcode == 8'heb)) begin
-                      si[3] <= sh24[23];
+                      si <= {3'b000, sh24[23]};
                       si[2] <= sh24[22];
                       si[1] <= sh24[21];
                       si[0] <= sh24[20];
@@ -121,7 +125,7 @@ module master (
                     phase <= 1'b0;
                     if ((opcode == 8'h38) || (opcode == 8'heb)?(bit_cnt == 20):(bit_cnt == 23)) begin
                         bit_cnt <= 0;
-                        io_oe <= ((opcode == 8'h03)) ? 1'b0 : 1'b1;
+                        io_oe <= (opcode == 8'h03 || opcode == 8'heb) ? 1'b0 : 1'b1;
                         state <= (opcode == 8'heb ) ? DUMMY:DATA;
                     end
                 end
@@ -149,7 +153,7 @@ module master (
                     if (!phase) begin
                         phase <= 1'b1;
                     end else begin
-                        rd_shift <= (opcode == 8'heb)?{rd_shift[3:0], so[3], so[2], so[1], so[0]}:{rd_shift[6:0], so[1]};
+                        rd_shift <= (opcode == 8'hEB) ?  {rd_shift[3:0], so_quad[3], so_quad[2], so_quad[1], so_quad[0]} : {rd_shift[6:0], so_single};
                         bit_cnt <= (opcode == 8'heb) ?(bit_cnt + 4):(bit_cnt + 1);
                         //bit_cnt <= bit_cnt + 1;
                         phase <= 1'b0;
@@ -183,9 +187,10 @@ module master (
                         if ((opcode == 8'h38)?(bit_cnt >= 4):(bit_cnt == 7)) begin
                             bit_cnt <= 0;
                             byte_cnt <= byte_cnt + 1;
-                            if (byte_cnt == burst_len)
+                            if (byte_cnt == burst_len)begin
                                 CS <=  (opcode == 8'h02 || opcode == 8'h01) ? 1'b1 : 1'b0;
                                 state <= DONE;
+                            end
                         end
                         else
                             CS <=   1'b0;
