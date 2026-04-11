@@ -109,6 +109,49 @@ add wave /top/vif/IO
 
 add wave -divider "FLASH RESPONSE"
 add wave /top/flash/SO
+add wave /top/flash/Status_Reg
+add wave /top/flash/STATE
+add wave /top/flash/QE
+add wave /top/flash/CMD_BUS
+add wave /top/flash/WRSR_Mode
+add wave /top/flash/WRSR2_Mode
+add wave /top/flash/SI_Reg
+add wave /top/flash/Status_Reg
+add wave /top/flash/WRSR_Event
+add wave /top/flash/Bit
+add wave /top/flash/CS_INT
+add wave /top/flash/DP_Mode
+add wave /top/flash/Address
+add wave /top/flash/WIP
+add wave /top/flash/WEL
+add wave /top/flash/Secur_Mode
+add wave /top/flash/Chip_EN
+add wave /top/flash/HPM_RD
+add wave /top/flash/EPSUSP
+add wave /top/flash/tPP
+add wave /top/flash/SI
+add wave /top/flash/SO
+add wave /top/flash/WP
+add wave /top/flash/SIO3
+add wave /top/dut//io_oe
+add wave /top/flash/CR
+add wave /top/flash/Read_SHSL
+add wave /top/flash/Read_4XIO_Mode
+add wave /top/flash/READ4X_Mode
+add wave /top/flash/FastRD_4XIO_Mode
+add wave /top/flash/FastRD_4XIO_Chk
+add wave /top/flash/SIO0_Reg
+add wave /top/flash/SIO1_Reg
+add wave /top/flash/SIO2_Reg
+add wave /top/flash/SIO3_Reg
+add wave /top/flash/SIO0_Out_Reg
+add wave /top/flash/SIO1_Out_Reg
+add wave /top/flash/SIO2_Out_Reg
+add wave /top/flash/SIO3_Out_Reg
+add wave /top/flash/Dummy_A
+add wave /top/flash/SI_OUT_EN
+add wave /top/flash/HOLD_OUT_B
+
 
 ############################################################
 # Run Simulation
