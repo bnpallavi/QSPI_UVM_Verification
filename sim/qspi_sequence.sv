@@ -32,20 +32,29 @@ class qspi_sequence extends uvm_sequence #(qspi_item);
    finish_item(tr);
 
 
-   // Page Program
-   tr = qspi_item::type_id::create("tr");
-   start_item(tr);
+  // Page Program
+  tr = qspi_item::type_id::create("tr");
+  start_item(tr);
    tr.opcode = 8'h02;
    tr.address = 24'h000010;
    tr.write_data = 8'hA5;
-   tr.burst_len = 1;
-   finish_item(tr);
+  tr.burst_len = 1;
+  finish_item(tr);
 
 
    // Wait for flash program completion ( > tPP )
    #400_000;
+   #1us;
+ // SPI Read
+   tr = qspi_item::type_id::create("tr");
+   start_item(tr);
+   tr.opcode = 8'h03;
+   tr.address = 24'h000010;
+   tr.write_data = 8'h00;
+   tr.burst_len = 1;
+   finish_item(tr);
 
-
+   #400_000;
    // Debug: Read Status Register
    tr = qspi_item::type_id::create("tr");
    start_item(tr);
@@ -56,15 +65,7 @@ class qspi_sequence extends uvm_sequence #(qspi_item);
    finish_item(tr);
 
 
-   // SPI Read
-   tr = qspi_item::type_id::create("tr");
-   start_item(tr);
-   tr.opcode = 8'h03;
-   tr.address = 24'h000010;
-   tr.write_data = 8'h00;
-   tr.burst_len = 1;
-   finish_item(tr);
-
+  
 
    // Extra safety delay
    #3_000_000;
@@ -80,8 +81,8 @@ class qspi_sequence extends uvm_sequence #(qspi_item);
    tr.write_data = 8'h00;
    tr.burst_len = 0;
    finish_item(tr);
-
-
+   #3_000_000;
+   
    // Write Status Register (QE = 1)
    tr = qspi_item::type_id::create("tr");
    start_item(tr);
@@ -116,7 +117,7 @@ class qspi_sequence extends uvm_sequence #(qspi_item);
    tr.write_data = 8'h00;
    tr.burst_len = 0;
    finish_item(tr);
-
+  #400_000;
 
    // Quad Page Program
    tr = qspi_item::type_id::create("tr");
@@ -130,13 +131,13 @@ class qspi_sequence extends uvm_sequence #(qspi_item);
 
    // Wait for quad program completion
    #400_000;
-
+   #1us;
 
    // Quad Read
    tr = qspi_item::type_id::create("tr");
    start_item(tr);
-   tr.opcode = 8'hEB;
-   tr.address = 24'h000020;
+   tr.opcode = 8'h6B;
+   tr.address = 24'h000010;
    tr.write_data = 8'h00;
    tr.burst_len = 1;
    finish_item(tr);
