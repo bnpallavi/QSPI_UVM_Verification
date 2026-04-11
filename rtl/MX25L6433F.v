@@ -43,8 +43,8 @@
             `define TPRS    300
             `define TERS    300
             `define TBP     10_000
-            `define TPP     330_000
-            `define TSE     25_000_000
+            `define TPP     1000
+            `define TSE     2000
             `define TBE32   140_000_000
             `define TBE     250_000_000
             `define TCE     20_000		// unit is ms instead of ns
@@ -52,7 +52,8 @@
             `define TPRS    100_000
             `define TERS    200_000
             `define TBP     10_000
-            `define TPP     330_000
+           // `define TPP     330_000
+            `define TPP     1000
             `define TSE     25_000_000
             `define TBE32   140_000_000
             `define TBE     250_000_000
@@ -61,7 +62,8 @@
             `define TPRS    100_000
             `define TERS    200_000
             `define TBP     50_000
-            `define TPP     1_200_000
+            `define TPP     1000
+            //`define TPP     1_200_000
             `define TSE     200_000_000
             `define TBE32   600_000_000
             `define TBE     1_000_000_000
@@ -144,7 +146,7 @@ module MX25L6433F( SCLK,
                 tBE32           = `TBE32,    // Block 32KB erase time
                 tCE             = `TCE,      // unit is ms instead of ns  
                 tPP             = `TPP,      // Program time
-                tW              = 40_000_000,       // Write Status time
+                tW              = 1000,       // Write Status time
                 tWSR            = 1_000_000,     // Write Securityt Register time
                 tWPS            = 10_000,     // Write Protection Select time
                 tWP_SRAM        = 1_000, // Write protection sram time
@@ -411,7 +413,7 @@ module MX25L6433F( SCLK,
         CR              = {3'b000,`CR_Default4_0};
         READ4X_Mode     = 1'b0;
         reset_sm;
-        QE = 1'b1;
+       // QE = 1'b1;
         Status_Reg[6] = QE;
     end   
 
@@ -1530,7 +1532,7 @@ module MX25L6433F( SCLK,
     end
 
     always @ ( posedge RDSR_Mode ) begin
-        //read_status;
+        read_status;
     end
 
     always @ ( posedge RDCR_Mode ) begin
@@ -1665,6 +1667,35 @@ endtask
             end  // end forever
         end
     endtask // read_cr
+
+task read_status;
+    integer Dummy_Count;
+    begin
+        Dummy_Count = 8;
+
+        forever begin
+            @ (posedge ISCLK or posedge CS_INT);
+
+            if (CS_INT) begin
+                disable read_status;
+            end
+            else begin
+                SO_OUT_EN   = 1'b1;
+                SI_IN_EN    = 1'b0;
+                SO_IN_EN    = 1'b0;
+                WP_IN_EN    = 1'b0;
+                SIO3_IN_EN  = 1'b0;
+
+                Dummy_Count = Dummy_Count - 1;
+                SIO1_Reg <= Status_Reg[Dummy_Count];
+
+                if (Dummy_Count == 0)
+                    Dummy_Count = 8;
+            end
+        end
+    end
+endtask
+
 
     /*----------------------------------------------------------------------*/
     /*  Description: define a write status task                             */
